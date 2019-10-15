@@ -15,7 +15,9 @@ import play.api.mvc._
 @Singleton
 class RummyController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
   val rummyController: ControllerInterface = Rummy.controller
-  rummyController.add((s: String) => rummyAsString = s)
+  rummyController.add(() => {
+    rummyAsString = rummyController.currentStateAsString()
+  })
   var rummyAsString: String = ""
 
   /**
