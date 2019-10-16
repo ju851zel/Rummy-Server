@@ -2,10 +2,11 @@ package controllers
 
 import de.htwg.se.rummy.Rummy
 import de.htwg.se.rummy.controller.ControllerInterface
-import de.htwg.se.rummy.util.Observer
+import de.htwg.se.rummy.controller.component.ControllerState
 import javax.inject._
-import play.api._
 import play.api.mvc._
+
+import scala.util.matching.Regex
 
 
 /**
@@ -14,9 +15,16 @@ import play.api.mvc._
  */
 @Singleton
 class RummyController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
-  val rummyController: ControllerInterface = Rummy.controller
-  rummyController.add(() => {
-    rummyAsString = rummyController.currentStateAsString()
+  val PlayerNamePattern: Regex = "name [A-Za-z]+".r
+  val LayDownTilePattern: Regex = "(l [1-9][RBGY][01]|l 1[0123][RBGY][01])".r
+  val MoveTilePattern: Regex = "(m [1-9][RBGY][01] t [1-9][RBGY][01]|m 1[0123][RBGY][01] t [1-9][RBYG][01]|m 1[0-3][RBGY][01] t 1[0-3][RBGY][01]|m [1-9][RBGY][01] t 1[0-3][RBYG][01])".r
+  val elements = 12
+
+
+
+  val controller: ControllerInterface = Rummy.controller
+  controller.add(() => {
+    rummyAsString = controller.currentStateAsString()
   })
   var rummyAsString: String = ""
 
@@ -31,7 +39,61 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     Ok(views.html.index())
   }
 
-  def rummy(): Action[AnyContent] = Action {
+  def rummy(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    processInput(    request.getQueryString("input").getOrElse("ndkahbfhdfsdbfhm"))
     Ok(rummyAsString)
   }
+
+
+   private def processInput(input: String): Unit = {
+    if (input.equals("q")) {
+      System.exit(0)
+    }
+    controller.controllerState match {
+      case ControllerState.MENU => handleMenuInput(input)
+      case ControllerState.INSERTING_NAMES => handleNameInput(input)
+      case ControllerState.P_TURN => handleOnTurn(input)
+      case ControllerState.P_FINISHED => handleOnTurnFinished(input)
+    }
+  }
+
+   private def handleNameInput(name: String): Unit = {
+    name match {
+      case "f" => controller.nameInputFinished()
+      case "z" => controller.undo()
+      case "r" => controller.redo()
+      case PlayerNamePattern() => controller.addPlayerAndInit(name.substring(4).trim, elements)
+      case _ => wrongInput()
+    }
+  }
+
+  private def wrongInput() {
+    println("Could not identify your input. Are you sure it was correct'?")
+  }
+
+   private def handleOnTurnFinished(input: String): Unit = input match {
+    case "n" => controller.switchToNextPlayer()
+    case "s" => controller.storeFile()
+    case _ => wrongInput()
+  }
+
+   private def handleOnTurn(input: String): Unit = {
+    input match {
+      case LayDownTilePattern(c) => controller.layDownTile(c.split(" ").apply(1));
+      case MoveTilePattern(c) => controller.moveTile(c.split(" t ").apply(0).split(" ").apply(1), c.split(" t ").apply(1));
+      case "f" => controller.userFinishedPlay()
+      case "z" => controller.undo()
+      case "r" => controller.redo()
+      case _ => wrongInput()
+    }
+  }
+
+   private def handleMenuInput(input: String): Unit = {
+    input match {
+      case "c" => controller.createDesk(elements + 1)
+      case "l" => controller.loadFile()
+      case _ => wrongInput()
+    }
+  }
+
 }
