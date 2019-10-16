@@ -9,3 +9,5 @@ target
 .DS_Store
 .g8/
 /.g8/form/
+/*.deb
+/*.deb.1
