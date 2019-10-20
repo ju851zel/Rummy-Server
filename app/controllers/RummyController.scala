@@ -5,7 +5,7 @@ import de.htwg.se.rummy.controller.ControllerInterface
 import de.htwg.se.rummy.controller.component.ControllerState
 import de.htwg.se.rummy.util.Observer
 import javax.inject._
-import play.api.mvc._
+import play.api.mvc.{Action, _}
 
 import scala.util.matching.Regex
 
@@ -20,6 +20,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   val LayDownTilePattern: Regex = "(l [1-9][RBGY][01]|l 1[0123][RBGY][01])".r
   val MoveTilePattern: Regex = "(m [1-9][RBGY][01] t [1-9][RBGY][01]|m 1[0123][RBGY][01] t [1-9][RBYG][01]|m 1[0-3][RBGY][01] t 1[0-3][RBGY][01]|m [1-9][RBGY][01] t 1[0-3][RBYG][01])".r
   val elements = 12
+  var toMove: Option[String] = None
 
 
   val controller: ControllerInterface = Rummy.controller
@@ -41,9 +42,29 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     Ok(views.html.index())
   }
 
-  def rummy(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    processInput(request.getQueryString("input").getOrElse("ndkahbfhdfsdbfhm"))
-    Ok(rummyAsString)
+  def rummy(input: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    if (input.startsWith("m")) {
+      if (toMove.isEmpty) {
+        toMove = Some(input.replaceFirst("m", ""))
+      } else {
+        if (!toMove.get.equalsIgnoreCase(input.replaceFirst("m", ""))) {
+          processInput("m " + toMove.get + " t " + input.replaceFirst("m", ""))
+        }
+        toMove = None
+      }
+    } else {
+      processInput(input)
+    }
+    Ok(views.html.game(controller))
+  }
+
+
+  def showEverything(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(controller.currentStateAsString())
+  }
+
+  def rules(): Action[AnyContent] = Action {
+    Ok(views.html.rules())
   }
 
 
