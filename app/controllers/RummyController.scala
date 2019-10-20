@@ -26,7 +26,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   val controller: ControllerInterface = Rummy.controller
   controller.add(new Observer {
     override def update(): Unit = {
-      rummyAsString = controller.currentStateAsString()
+      rummyAsString = controller.currentStateMessage()
     }
   })
   var rummyAsString: String = ""
@@ -59,8 +59,8 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
 
-  def showEverything(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(controller.currentStateAsString())
+  def currentStateMessage(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok(controller.currentStateMessage())
   }
 
   def rules(): Action[AnyContent] = Action {

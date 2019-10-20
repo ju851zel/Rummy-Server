@@ -6,7 +6,7 @@
 # An example controller showing a sample home page
 GET        /index               controllers.RummyController.index
 GET        /game/:input         controllers.RummyController.rummy(input: String)
-GET        /game                controllers.RummyController.showEverything
+GET        /game                controllers.RummyController.currentStateMessage
 GET        /rules               controllers.RummyController.rules
 
 
