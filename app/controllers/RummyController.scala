@@ -3,6 +3,7 @@ package controllers
 import de.htwg.se.rummy.Rummy
 import de.htwg.se.rummy.controller.ControllerInterface
 import de.htwg.se.rummy.controller.component.ControllerState
+import de.htwg.se.rummy.util.Observer
 import javax.inject._
 import play.api.mvc._
 
@@ -21,10 +22,11 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   val elements = 12
 
 
-
   val controller: ControllerInterface = Rummy.controller
-  controller.add(() => {
-    rummyAsString = controller.currentStateAsString()
+  controller.add(new Observer {
+    override def update(): Unit = {
+      rummyAsString = controller.currentStateAsString()
+    }
   })
   var rummyAsString: String = ""
 
@@ -40,12 +42,12 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   def rummy(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    processInput(    request.getQueryString("input").getOrElse("ndkahbfhdfsdbfhm"))
+    processInput(request.getQueryString("input").getOrElse("ndkahbfhdfsdbfhm"))
     Ok(rummyAsString)
   }
 
 
-   private def processInput(input: String): Unit = {
+  private def processInput(input: String): Unit = {
     if (input.equals("q")) {
       System.exit(0)
     }
@@ -57,7 +59,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-   private def handleNameInput(name: String): Unit = {
+  private def handleNameInput(name: String): Unit = {
     name match {
       case "f" => controller.nameInputFinished()
       case "z" => controller.undo()
@@ -68,16 +70,16 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   private def wrongInput() {
-    println("Could not identify your input. Are you sure it was correct'?")
+    rummyAsString = "Could not identify your input. Are you sure it was correct'?"
   }
 
-   private def handleOnTurnFinished(input: String): Unit = input match {
+  private def handleOnTurnFinished(input: String): Unit = input match {
     case "n" => controller.switchToNextPlayer()
     case "s" => controller.storeFile()
     case _ => wrongInput()
   }
 
-   private def handleOnTurn(input: String): Unit = {
+  private def handleOnTurn(input: String): Unit = {
     input match {
       case LayDownTilePattern(c) => controller.layDownTile(c.split(" ").apply(1));
       case MoveTilePattern(c) => controller.moveTile(c.split(" t ").apply(0).split(" ").apply(1), c.split(" t ").apply(1));
@@ -88,7 +90,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     }
   }
 
-   private def handleMenuInput(input: String): Unit = {
+  private def handleMenuInput(input: String): Unit = {
     input match {
       case "c" => controller.createDesk(elements + 1)
       case "l" => controller.loadFile()
