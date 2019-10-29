@@ -1,8 +1,7 @@
 #infoText {
     font-size: 25px;
-    color: yellow;
-    background: black;
-    text-align: center;
+    color: darkred;
+    /*    background: black;*/
     margin-left: 50px;
     margin-right: 50px;
     margin-top: 50px;
@@ -17,24 +16,26 @@
     border-radius: 5px;
 }
 
-#desk{
-    background-color: burlywood;
+#desk {
+    background-image: url("../images/samt-image.jpg");
     display: grid;
+    border-radius: 5px;
     grid-gap: 10px;
-    margin-right: 50px;
-    margin-left: 50px;
+    margin-right: 1em;
+    margin-left: 1em;
+
 }
-.deskLine{
-    background-color: burlywood;
+
+.deskLine {
+    /*    background-color: burlywood;*/
     display: grid;
-    grid-gap: 10px;
     grid-template-columns: repeat(auto-fit, 150px);
     border-radius: 5px;
-    margin-left: 50px;
-    margin-right: 50px;
+    margin: 5px;
 }
+
 #userBoard {
-    background-color: saddlebrown;
+    background-image: url("../images/wood-image.jpg");
     display: grid;
     grid-gap: 10px;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -43,39 +44,47 @@
 }
 
 .tileB {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px;
     text-align: center;
-    background-color: white;
-    color: blue;
+    background-color: dodgerblue;
+    color: black;
     border-radius: 5px;
 }
 
 .tileR {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px;
     text-align: center;
-    background-color: white;
-    color: red;
+    background-color: darkred;
+    color: black;
     border-radius: 5px;
 }
 
 .tileY {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px;
     text-align: center;
-    background-color: white;
-    color: gold;
+    background-color: gold;
+    color: black;
     border-radius: 5px;
 }
 
 .tileG {
-    margin-top: 5px;
-    margin-bottom: 5px;
+    margin: 5px;
     text-align: center;
-    background-color: white;
-    color: green;
+    background-color: greenyellow;
+    color: black;
     border-radius: 5px;
 }
 
+#element {
+    background-image: url("../images/joker.jpg");
+    background-color: white; /* Used if the image is unavailable */
+    height: 130ex; /* You must set a specified height */
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
+    text-align: center;
+}
 
+h3 {
+    color: darkred;
+}

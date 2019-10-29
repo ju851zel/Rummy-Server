@@ -4,7 +4,7 @@
 
 
 @main("HTWG Rummy") {
-    <div>
+    <div id="element">
         <div>
             <p id="infoText">
             @controller.currentStateMessage()
@@ -53,7 +53,7 @@
             </div>
             <hr>
             <h3>The Desk:</h3>
-            <div id="table">
+            <div id="desk">
             @if(controller.controllerState == ControllerState.P_TURN) {
                 @for(set <- controller.getTileSet) {
                     @for(sorted <- set) {
