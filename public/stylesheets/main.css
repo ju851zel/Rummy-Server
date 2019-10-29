@@ -1,0 +1,81 @@
+#infoText {
+    font-size: 25px;
+    color: yellow;
+    background: black;
+    text-align: center;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 50px;
+}
+
+.tile {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+}
+
+#desk{
+    background-color: burlywood;
+    display: grid;
+    grid-gap: 10px;
+    margin-right: 50px;
+    margin-left: 50px;
+}
+.deskLine{
+    background-color: burlywood;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(auto-fit, 150px);
+    border-radius: 5px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+#userBoard {
+    background-color: saddlebrown;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.tileB {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    background-color: white;
+    color: blue;
+    border-radius: 5px;
+}
+
+.tileR {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    background-color: white;
+    color: red;
+    border-radius: 5px;
+}
+
+.tileY {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    background-color: white;
+    color: gold;
+    border-radius: 5px;
+}
+
+.tileG {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    background-color: white;
+    color: green;
+    border-radius: 5px;
+}
+
+

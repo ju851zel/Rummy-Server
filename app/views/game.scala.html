@@ -7,7 +7,7 @@
     <div>
         <div>
             <p id="infoText">
-                @controller.currentStateMessage()
+            @controller.currentStateMessage()
             </p>
             <div id="actionButtons">
                 @if(controller.controllerState == ControllerState.MENU) {
@@ -57,16 +57,42 @@
             @if(controller.controllerState == ControllerState.P_TURN) {
                 @for(set <- controller.getTileSet) {
                     @for(sorted <- set) {
-                        <p>
+                        <div class="deskLine">
                         @for(tile <- set) {
-                            <div>@tile.toString
-                             <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
-                                <input value="Select to move" type="submit">
-                            </form>
-                        </div>
+                            @if(tile.color.toString.equals("BLUE")) {
+                                <div class="tileB">@tile.toString
+                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input value="Select to move" type="submit">
+                                    </form>
+                                </div>
+                            }
+
+                            @if(tile.color.toString.equals("RED")) {
+                                <div class="tileR">@tile.toString
+                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input value="Select to move" type="submit">
+                                    </form>
+                                </div>
+                            }
+                            @if(tile.color.toString.equals("YELLOW")) {
+                                <div class="tileY">@tile.toString
+                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input value="Select to move" type="submit">
+                                    </form>
+                                </div>
+                            }
+                            @if(tile.color.toString.equals("GREEN")) {
+                                <div class="tileG">@tile.toString
+                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input value="Select to move" type="submit">
+                                    </form>
+                                </div>
+                            }
                         }
-                        </p>
+                        </div>
+
                     }
+                    <p></p>
                 }
             }
             </div>
@@ -75,16 +101,41 @@
             <div id="userBoard">
             @if(controller.controllerState == ControllerState.P_TURN) {
                 @for(tile <- controller.viewOfBoard) {
-                    <p>
-                <div>@tile.toString <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
-                        <input value="Lay down" type="submit">
-                    </form></div>
+                    @if(tile.color.toString.equals("BLUE")) {
+                        <div class="tileB">@tile.toString
+                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                <input value="Lay down" type="submit">
+                            </form>
+                        </div>
+                    }
 
-                    </p>
+                    @if(tile.color.toString.equals("RED")) {
+                        <div class="tileR">@tile.toString
+                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                <input value="Lay down" type="submit">
+                            </form>
+                        </div>
+                    }
+                    @if(tile.color.toString.equals("YELLOW")) {
+                        <div class="tileY">@tile.toString
+                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                <input value="Lay down" type="submit">
+                            </form>
+                        </div>
+                    }
+                    @if(tile.color.toString.equals("GREEN")) {
+                        <div class="tileG">@tile.toString
+                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                <input value="Lay down" type="submit">
+                            </form>
+                        </div>
+                    }
+
                 }
             }
             </div>
         </div>
-    </div>
-}
 
+    </div>
+
+}
