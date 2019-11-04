@@ -4,10 +4,10 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET        /index               controllers.RummyController.index
 GET        /game/:input         controllers.RummyController.rummy(input: String)
-GET        /game                controllers.RummyController.currentStateMessage
+GET        /game                controllers.RummyController.rummy(input: String)
 GET        /rules               controllers.RummyController.rules
+#GET         /controllerState    controllers.RummyController.controllerState()
 
 
 # Map static resources from the /public folder to the /assets URL path

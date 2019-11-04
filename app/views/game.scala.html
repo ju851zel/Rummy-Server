@@ -1,141 +1,277 @@
 @import de.htwg.se.rummy.controller.ControllerInterface
 @import de.htwg.se.rummy.controller.component.ControllerState
+@import de.htwg.se.rummy.controller.component.AnswerState
 @(controller: ControllerInterface)
 
-
 @main("HTWG Rummy") {
-    <div id="element">
-        <div>
-            <p id="infoText">
-            @controller.currentStateMessage()
-            </p>
-            <div id="actionButtons">
-                @if(controller.controllerState == ControllerState.MENU) {
-                    <form action="@controllers.routes.RummyController.rummy("c")">
-                        <input value="Create Desk" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("l")">
-                        <input value="Load Game" type="submit">
-                    </form>
-                }
-                @if(controller.controllerState == ControllerState.INSERTING_NAMES) {
-                    <form action="@controllers.routes.RummyController.rummy("name MIKE")">
-                        Name: <input id="nameField" type="text" name="name">
-                        <input value="Confirm name" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("f")">
-                        <input value="Finished Name Input" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("z")">
-                        <input value="Undo" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("r")">
-                        <input value="Redo" type="submit">
-                    </form>
-                }
-                @if(controller.controllerState == ControllerState.P_TURN) {
-                    <form action="@controllers.routes.RummyController.rummy("f")">
-                        <input value="Finished" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("z")">
-                        <input value="Undo" type="submit">
-                    </form>
-                    <form action="@controllers.routes.RummyController.rummy("r")">
-                        <input value="Redo" type="submit">
-                    </form>
-                }
-                @if(controller.controllerState == ControllerState.P_FINISHED) {
-                    <form action="@controllers.routes.RummyController.rummy("n")">
-                        <input value="Next" type="submit">
-                    </form>
-                }
 
+    <div class="container">
+        <div class="container ">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="alert alert-light " role="alert">
+                    @answerState(controller.currentAnswerState)
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("z")">
+                        <input class="btn btn-primary" value="Undo" type="submit">
+                    </form>
+
+                    <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("r")">
+                        <input class="btn btn-primary" value="Redo" type="submit">
+                    </form>
+                </div>
             </div>
-            <hr>
-            <h3>The Desk:</h3>
-            <div id="desk">
-            @if(controller.controllerState == ControllerState.P_TURN) {
-                @for(set <- controller.getTileSet) {
-                    @for(sorted <- set) {
-                        <div class="deskLine">
-                        @for(tile <- set) {
-                            @if(tile.color.toString.equals("BLUE")) {
-                                <div class="tileB">@tile.toString
-                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
-                                        <input value="Select to move" type="submit">
-                                    </form>
-                                </div>
-                            }
 
-                            @if(tile.color.toString.equals("RED")) {
-                                <div class="tileR">@tile.toString
-                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
-                                        <input value="Select to move" type="submit">
-                                    </form>
-                                </div>
-                            }
-                            @if(tile.color.toString.equals("YELLOW")) {
-                                <div class="tileY">@tile.toString
-                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
-                                        <input value="Select to move" type="submit">
-                                    </form>
-                                </div>
-                            }
-                            @if(tile.color.toString.equals("GREEN")) {
-                                <div class="tileG">@tile.toString
-                                    <form action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
-                                        <input value="Select to move" type="submit">
-                                    </form>
-                                </div>
-                            }
-                        }
-                        </div>
+        </div>
 
-                    }
-                    <p></p>
-                }
+        <div class="alert alert-primary" role="alert">
+        @controllerState(controller.currentControllerState)
+        </div>
+        <hr>
+
+
+        <div class="row col-md-12" id="actionButtons">
+            @if(controller.currentControllerState == ControllerState.MENU) {
+                <div class="m-md-auto">
+                    <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("c")">
+                        <input class="button btn-primary" value="Create Desk" type="submit">
+                    </form>
+                    <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("l")">
+                        <input class="button btn-primary" value="Load Game" type="submit">
+                    </form>
+                </div>
             }
-            </div>
-            <hr>
-            <h3>The Board:</h3>
-            <div id="userBoard">
-            @if(controller.controllerState == ControllerState.P_TURN) {
-                @for(tile <- controller.viewOfBoard) {
-                    @if(tile.color.toString.equals("BLUE")) {
-                        <div class="tileB">@tile.toString
-                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
-                                <input value="Lay down" type="submit">
-                            </form>
-                        </div>
-                    }
+            @if(controller.currentControllerState == ControllerState.INSERTING_NAMES) {
 
-                    @if(tile.color.toString.equals("RED")) {
-                        <div class="tileR">@tile.toString
-                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
-                                <input value="Lay down" type="submit">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form action="@controllers.routes.RummyController.rummy("name MIKE")">
+                                <div class="form-group">
+                                    <label for="idName">Name</label>
+                                    <input type="text" class="form-control" id="idName" placeholder="John Smith">
+                                </div>
+                                <input class="btn btn-primary" value="Confirm name" type="submit">
                             </form>
                         </div>
-                    }
-                    @if(tile.color.toString.equals("YELLOW")) {
-                        <div class="tileY">@tile.toString
-                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
-                                <input value="Lay down" type="submit">
-                            </form>
-                        </div>
-                    }
-                    @if(tile.color.toString.equals("GREEN")) {
-                        <div class="tileG">@tile.toString
-                            <form action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
-                                <input value="Lay down" type="submit">
-                            </form>
-                        </div>
-                    }
 
+                        <div class="col-md-6">
+                            <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("f")">
+                                <input class="btn btn-primary" value="Finished Name Input" type="submit">
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            }
+            @if(controller.currentControllerState == ControllerState.P_TURN) {
+                <div class="container">
+                    <div class="row">
+                        <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("f")">
+                            <input class="btn btn-primary" value="Finished" type="submit">
+                        </form>
+                    </div>
+                </div>
+
+            }
+            @if(controller.currentControllerState == ControllerState.NEXT_TYPE_N) {
+
+                <div class="container">
+                    <div class="row">
+                        <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("n")">
+                            <input class="btn btn-primary" value="Next" type="submit">
+                        </form>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <hr>
+        <div class="row">
+            <h3>The Desk</h3>
+            <div class="col-md-12" id="desk">
+            @for(set <- controller.viewOfTable) {
+                <div class="container col-md-12">
+                @for(sorted <- set) {
+                    <div class="row my-4">
+
+                    @for(tile <- set) {
+
+                        @if(tile.color.toString.equals("BLUE")) {
+                            <div class="tileB">
+                                <div class="mx-1 align-content-center text-center" >
+                                    <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                    <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input class="btn btn-link" value="Move" type="submit">
+                                    </form>
+                                </div>
+                            </div>
+                        }
+
+                        @if(tile.color.toString.equals("RED")) {
+                            <div class="tileR">
+                                <div class="mx-1 align-content-center text-center" >
+                                    <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                    <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input class="btn btn-link" value="Move" type="submit">
+                                    </form>
+                                </div>
+                            </div>
+                        }
+
+                        @if(tile.color.toString.equals("YELLOW")) {
+                            <div class="tileY">
+                                <div class="mx-1 align-content-center text-center" >
+                                    <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                    <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input class="btn btn-link" value="Move" type="submit">
+                                    </form>
+                                </div>
+                            </div>
+                        }
+
+                        @if(tile.color.toString.equals("GREEN")) {
+                            <div class="tileG">
+                                <div class="mx-1 align-content-center text-center" >
+                                    <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                    <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                        <input class="btn btn-link" value="Move" type="submit">
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    }
+                    </div>
                 }
+                </div>
+
             }
             </div>
         </div>
+        <div class="row">
+            <h3>The Board</h3>
+            <div class="col-md-12" id="userBoard">
+                @if(controller.currentControllerState == ControllerState.P_TURN) {
+                    <div class="container">
+                        <div class="row">
+                            @for(tile <- controller.viewOfBoard) {
 
+
+                                @if(tile.color.toString.equals("BLUE")) {
+                                    <div class="tileB">
+                                        <div class="mx-1 align-content-center text-center" >
+                                            <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <input class="btn btn-link" value="Move" type="submit">
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if(tile.color.toString.equals("RED")) {
+                                    <div class="tileR">
+                                        <div class="mx-1 align-content-center text-center" >
+                                            <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <input class="btn btn-link" value="Move" type="submit">
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                                @if(tile.color.toString.equals("YELLOW")) {
+                                    <div class="tileY">
+                                        <div class="mx-1 align-content-center text-center" >
+                                            <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <input class="btn btn-link" value="Move" type="submit">
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                                @if(tile.color.toString.equals("GREEN")) {
+                                    <div class="tileG">
+                                        <div class="mx-1 align-content-center text-center" >
+                                            <h3 class="text-white">@tile.toString.dropRight(2)</h3>
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <input class="btn btn-link" value="Move" type="submit">
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        }
+            </div>
+            </div>
+
+            </div>
+        </div>
     </div>
 
+}
+@controllerState(state: ControllerState.Value) = @{
+    state match {
+        case ControllerState.P_TURN =>
+            s"${controller.getCurrentPlayer.name} it's your turn."
+        case ControllerState.KILL =>
+            System.exit(0)
+        case ControllerState.INSERTING_NAMES =>
+            "Insert a players name. (Min 2 players, Max 4) or finish with 'f'"
+        case ControllerState.NEXT_TYPE_N =>
+            "It is the next players turn"
+        case _ =>
+            "Click On Create Desk."
+    }
+}
+
+@answerState(answerState: AnswerState.Value) = @{
+    answerState match {
+        case AnswerState.P_FINISHED =>
+            "You are finished."
+        case AnswerState.TABLE_NOT_CORRECT =>
+            "Table looks not correct, please move tiles to match the rules or undo until it matches"
+        case AnswerState.P_WON =>
+            s"${controller.getCurrentPlayer.name} is the winner."
+        case AnswerState.UNDO_TAKE_TILE =>
+            "The tile has been put back in the bag"
+        case AnswerState.BAG_IS_EMPTY =>
+            "No more tiles in the bag. You must lay a tile down"
+        case AnswerState.CANT_MOVE_THIS_TILE =>
+            "You can not move this tile."
+        case AnswerState.UNDO_MOVED_TILE =>
+            "You undid the move of a specific tile."
+        case AnswerState.MOVED_TILE =>
+            "You did move a tile to another."
+        case AnswerState.UNDO_LAY_DOWN_TILE =>
+            "You undid the lay down you took the tile up."
+        case AnswerState.ADDED_PLAYER =>
+            "You added a player."
+        case AnswerState.PUT_TILE_DOWN =>
+            "You put down a tile"
+        case AnswerState.PLAYER_REMOVED =>
+            "You removed the player you inserted."
+        case AnswerState.P_DOES_NOT_OWN_TILE =>
+            "You dont have this tile on the board. Please select another one"
+        case AnswerState.INSERTING_NAMES_FINISHED =>
+            "You finished inserting the names."
+        case AnswerState.STORED_FILE =>
+            "You stored the game in a file"
+        case AnswerState.NOT_ENOUGH_PLAYERS =>
+            "Not enough Players. Add some more."
+        case AnswerState.COULD_NOT_LOAD_FILE =>
+            "Could not load the file. Created a new game instead."
+        case AnswerState.LOADED_FILE =>
+            "You loaded a file"
+        case AnswerState.CREATED_DESK =>
+            "You started the game by creating a desk"
+        case AnswerState.P_FINISHED_UNDO =>
+            "Its is again your turn. "
+        case _ =>
+            "Lets start, shall we?"
+    }
 }
