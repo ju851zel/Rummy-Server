@@ -22,9 +22,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   var toMove: Option[String] = None
   val controller: ControllerInterface = Rummy.controller
 
-  controller.add(() => {
-    rummyAsString = controller.currentControllerState.toString
-  })
+  controller.add(() => {})
   var rummyAsString: String = ""
 
 
@@ -72,7 +70,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
   private def wrongInput() {
-    rummyAsString = "Could not identify your input. Are you sure it was correct'?"
+    rummyAsString = ""
   }
 
   private def handleOnTurnFinished(input: String): Unit = input match {
