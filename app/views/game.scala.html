@@ -3,31 +3,17 @@
 @import de.htwg.se.rummy.controller.component.AnswerState
 @(controller: ControllerInterface)
 
+@toScalar(house:Int)=@{3 }
+
 @main("HTWG Rummy") {
 
     <div class="container">
         <div class="container ">
             <div class="row">
-                <div class="col-sm-9">
-                    <div class="alert alert-light " role="alert">
+                <div class="col-sm-12 shadow p-3 mb-3 bg-white rounded" id="newsDiv">
+                    <div class="text-center" role="alert">
                     @answerState(controller.currentAnswerState)
                     </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="btn-group">
-                        <button class="btn">
-                            <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("z")">
-                                <input class="btn btn-primary" value="Undo" type="submit">
-                            </form>
-                        </button>
-                        <button class="btn">
-                            <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("r")">
-                                <input class="btn btn-primary" value="Redo" type="submit">
-                            </form>
-                        </button>
-                    </div>
-
-
                 </div>
             </div>
 
@@ -44,25 +30,23 @@
                 <div class="m-md-auto">
                     <div class="btn-group">
                         <button class="btn">
-                            <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("c")">
+                            <form class="btn btn-primary" action="@controllers.routes.RummyController.createGame()">
                                 <input class="button btn-primary" value="Create Desk" type="submit">
                             </form>
                         </button>
                         <button class="btn">
-                            <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("l")">
+                            <form class="btn btn-primary" action="@controllers.routes.RummyController.loadFile()">
                                 <input class="button btn-primary" value="Load Game" type="submit">
                             </form>
                         </button>
                     </div>
-
                 </div>
             }
             @if(controller.currentControllerState == ControllerState.INSERTING_NAMES) {
-
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
-                            <form action="@controllers.routes.RummyController.rummy("name MIKE")">
+                            <form action="@controllers.routes.RummyController.addPlayer("MIKE")">
                                 <div class="form-group">
                                     <label for="idName">Name</label>
                                     <input type="text" class="form-control" id="idName" placeholder="John Smith">
@@ -76,28 +60,20 @@
                             </form>
                             <div class="btn-group">
                                 <button class="btn">
-                                    <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("f")">
+                                    <form class="btn btn-primary" action="@controllers.routes.RummyController.finishNameInput()">
                                         <input class="btn btn-primary" value="Finished Name Input" type="submit">
                                     </form>
                                 </button>
                             </div>
-
-
-                        </div>
-                        <div class="col-md-6">
-
                         </div>
                     </div>
-
-
                 </div>
-
 
             }
             @if(controller.currentControllerState == ControllerState.P_TURN) {
                 <div class="container">
                     <div class="row">
-                        <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("f")">
+                        <form class="btn btn-primary" action="@controllers.routes.RummyController.finishTurn()">
                             <input class="btn btn-primary" value="Finished" type="submit">
                         </form>
                     </div>
@@ -108,7 +84,7 @@
 
                 <div class="container">
                     <div class="row">
-                        <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("n")">
+                        <form class="btn btn-primary" action="@controllers.routes.RummyController.switchToNextPlayer()">
                             <input class="btn btn-primary" value="Next" type="submit">
                         </form>
                     </div>
@@ -133,7 +109,7 @@
                                     <div class="tileB">
                                         <div class="mx-1 align-content-center text-center" >
                                             <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.moveTile(tile.toString)">
                                                 <input class="btn btn-link" value="Move" type="submit">
                                             </form>
                                         </div>
@@ -144,7 +120,7 @@
                                     <div class="tileR">
                                         <div class="mx-1 align-content-center text-center" >
                                             <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.moveTile(tile.toString)">
                                                 <input class="btn btn-link" value="Move" type="submit">
                                             </form>
                                         </div>
@@ -155,7 +131,7 @@
                                     <div class="tileY">
                                         <div class="mx-1 align-content-center text-center" >
                                             <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.moveTile(tile.toString)">
                                                 <input class="btn btn-link" value="Move" type="submit">
                                             </form>
                                         </div>
@@ -166,7 +142,7 @@
                                     <div class="tileG">
                                         <div class="mx-1 align-content-center text-center" >
                                             <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                            <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("m" + tile.value.toString + tile.color.toString.charAt(0) + tile.ident)">
+                                            <form class="btn btn-link" action="@controllers.routes.RummyController.moveTile(tile.toString)">
                                                 <input class="btn btn-link" value="Move" type="submit">
                                             </form>
                                         </div>
@@ -190,13 +166,11 @@
                         <div class="container">
                             <div class="row">
                                 @for(tile <- controller.viewOfBoard) {
-
-
                                     @if(tile.color.toString.equals("BLUE")) {
                                         <div class="tileB">
                                             <div class="mx-1 align-content-center text-center" >
                                                 <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                                <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <form class="btn btn-link" action="@controllers.routes.RummyController.laydown(tile.toString)">
                                                     <input class="btn btn-link" value="Move" type="submit">
                                                 </form>
                                             </div>
@@ -207,7 +181,7 @@
                                         <div class="tileR">
                                             <div class="mx-1 align-content-center text-center" >
                                                 <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                                <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <form class="btn btn-link" action="@controllers.routes.RummyController.laydown(tile.toString)">
                                                     <input class="btn btn-link" value="Move" type="submit">
                                                 </form>
                                             </div>
@@ -217,7 +191,7 @@
                                         <div class="tileY">
                                             <div class="mx-1 align-content-center text-center" >
                                                 <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                                <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <form class="btn btn-link" action="@controllers.routes.RummyController.laydown(tile.toString)">
                                                     <input class="btn btn-link" value="Move" type="submit">
                                                 </form>
                                             </div>
@@ -227,7 +201,7 @@
                                         <div class="tileG">
                                             <div class="mx-1 align-content-center text-center" >
                                                 <h3 class="text-white">@tile.toString.dropRight(2)</h3>
-                                                <form class="btn btn-link" action="@controllers.routes.RummyController.rummy("l " + tile.value + tile.color.toString.charAt(0) + tile.ident)">
+                                                <form class="btn btn-link" action="@controllers.routes.RummyController.laydown(tile.toString)">
                                                     <input class="btn btn-link" value="Move" type="submit">
                                                 </form>
                                             </div>
