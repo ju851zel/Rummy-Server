@@ -21,3 +21,9 @@ function newsDiv() {
     document.getElementById("newsDiv").setAttribute("class", "shadow-lg");
 }
 
+
+
+
+$(document).ready(function() {
+    console.log('The DOM is ready!');
+});
