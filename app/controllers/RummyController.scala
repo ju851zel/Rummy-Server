@@ -67,7 +67,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
 
   def addPlayer(name: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
-      controller.addPlayerAndInit(name.substring(4).trim, 12)
+      controller.addPlayerAndInit(name, 12)
     }
     Ok(views.html.game(controller))
   }

@@ -3,7 +3,7 @@
 @import de.htwg.se.rummy.controller.component.AnswerState
 @(controller: ControllerInterface)
 
-@toScalar(house:Int)=@{3 }
+@toScalar(house: Int) = @{3}
 
 @main("HTWG Rummy") {
 
@@ -46,25 +46,16 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
-                            <form action="@controllers.routes.RummyController.addPlayer("MIKE")">
-                                <div class="form-group">
-                                    <label for="idName">Name</label>
-                                    <input type="text" class="form-control" id="idName" placeholder="John Smith">
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn">
-                                        <input class="btn btn-primary" value="Confirm name" type="submit">
-                                    </button>
-
-                                </div>
-                            </form>
-                            <div class="btn-group">
-                                <button class="btn">
-                                    <form class="btn btn-primary" action="@controllers.routes.RummyController.finishNameInput()">
-                                        <input class="btn btn-primary" value="Finished Name Input" type="submit">
-                                    </form>
-                                </button>
+                            <div class="form-group">
+                                <label for="input-name">Name</label>
+                                <input type="text" class="form-control" id="input-name" placeholder="John Smith">
                             </div>
+                            <button class="btn btn-primary" id="btn-confirmName">
+                                Confirm Name
+                            </button>
+                            <button class="btn btn-primary" id="btn-finishName">
+                                FinishNameInput
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -102,9 +93,7 @@
                         <div class="container col-md-12">
                         @for(sorted <- set) {
                             <div class="row my-4">
-
                             @for(tile <- set) {
-
                                 @if(tile.color.toString.equals("BLUE")) {
                                     <div class="tileB">
                                         <div class="mx-1 align-content-center text-center" >

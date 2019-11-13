@@ -1,9 +1,18 @@
 document.getElementById("btn-undo").addEventListener("click", undo);
-document.getElementById("newsDiv").addEventListener("click", newsDiv);
+document.getElementById("btn-confirmName").addEventListener("click", addPlayer);
+document.getElementById("btn-finishName").addEventListener("click", finishNameInput);
 
 
+function addPlayer() {
+    let name = document.getElementById("input-name").value;
+    return window.location.href = "http://localhost:9000/addPlayer/" + name;
+}
 
-function undo(){
+function finishNameInput() {
+    return window.location.href = "http://localhost:9000/finishNameInput"
+}
+
+function undo() {
     console.log("Button undo pressed")
 }
 
