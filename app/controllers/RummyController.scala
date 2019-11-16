@@ -118,7 +118,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     if (controller.currentControllerState == ControllerState.MENU) {
       controller.createDesk(12)
     }
-    Ok(controller.toJson().toString())
+    Ok(controller.toJson())
   }
 
   def loadFile()(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
@@ -135,7 +135,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     Ok(controller.toJson())
   }
 
-  def undo(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def undo(): Action[AnyContent] = Action {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.undo()
@@ -144,7 +144,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
 
-  def redo(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def redo(): Action[AnyContent] = Action {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.redo()
@@ -159,7 +159,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     Ok(controller.toJson().toString())
   }
 
-  def switchToNextPlayer(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def switchToNextPlayer(): Action[AnyContent] = Action {
     if (controller.currentControllerState == ControllerState.NEXT_TYPE_N) {
       controller.switchToNextPlayer()
     }
@@ -192,6 +192,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
           tileToMove = None
         } else {
           controller.moveTile(Tile.stringToTile(tile), tileToMove.get)
+          tileToMove = None
         }
       } else {
         tileToMove = Some(Tile.stringToTile(tile))

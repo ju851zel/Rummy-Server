@@ -1,108 +1,117 @@
 let game = {
-    sets: []
+    desk: {
+        sets: [],
+        players: []
+    }
 };
-
-
-function undo() {
-    console.log("Button undo pressed")
-}
+const defaultGame = game;
 
 function createMenuButtons() {
     $("#interaction").empty();
-    $("#interaction").append(
-        '<button class="btn btn-primary" id="btnCreate">Create Desk</button>' +
-        '<button class="btn btn-primary" id="btnLoad">Load file</button>'
-    );
-    $("#btnCreate").click(() => {
-        $.ajax({
+    $("#interaction").append($('<button/>', {
+        text: 'Create Desk',
+        id: 'btnCreate',
+        "class": "btn btn-primary",
+        click: () => $.ajax({
             method: "GET",
             url: "/game/create",
             dataType: "json",
-            success: result => {
-                game = result;
-                console.log(result);
-                update()
-            }
+            success: result => update(result)
         })
-    })
+    }));
 }
 
 function createInsertingNamesButtons() {
-    $("#interaction").empty();
-    $("#interaction").append(
-        "<div class=\"form-group\">" +
-        "    <label for=\"input-name\">Name</label>" +
-        "    <input type=\"text\" class=\"form-control\" id=\"input-name\" placeholder=\"John\">" +
-        "</div>" +
-        "<button class=\"btn btn-primary\" id=\"btnConfirmName\">Confirm Name</button>" +
-        "<button class=\"btn btn-primary\" id=\"btnFinishName\">FinishNameInput</button>"
-    );
-    $("#btnConfirmName").click(() => {
-        let name = $("#input-name").val();
-        if (name === "") {
-            updateNews("Please insert a name");
-            return
-        }
-        $.ajax({
-            method: "GET",
-            url: "/game/name/add/" + name,
-            dataType: "json",
-            success: result => {
-                game = result;
-                console.log(result);
-                update()
-            }
-        })
+    let div = $('<div/>', {
+        'class': 'form-group',
     });
-    $("#btnFinishName").click(() => {
-        $.ajax({
-            method: "GET",
-            url: "/game/name/finish",
-            dataType: "json",
-            success: result => {
-                game = result;
-                console.log(result);
-                update()
+    div.append($('<label/>', {
+        for: 'input-name',
+        text: 'Name'
+    }));
+    div.append($('<input/>', {
+        id: 'input-name',
+        placeholder: 'John Smith',
+        type: 'text',
+        class: 'form-control'
+    }));
+    let btnConfirmName = $('<button/>', {
+        text: 'Confirm Name',
+        id: 'btnConfirmName',
+        "class": "btn btn-primary mr-2",
+        click: () => {
+            let name = $("#input-name").val();
+            if (name === "") {
+                updateNews("Please insert a name");
+                return
             }
-        })
-    })
+            $.ajax({
+                method: "GET",
+                url: "/game/name/add/" + name,
+                dataType: "json",
+                success: result => update(result)
+            })
+        }
+    });
+
+    let btnFinishInput = $('<button/>', {
+        text: 'Begin',
+        id: 'btnFinishName',
+        "class": "btn btn-primary mr-2",
+        click: () => {
+            $.ajax({
+                method: "GET",
+                url: "/game/name/finish",
+                dataType: "json",
+                success: result => update(result)
+            })
+        }
+    });
+
+    $("#interaction").empty();
+    $("#interaction").append(div);
+    $("#interaction").append(btnConfirmName);
+    $("#interaction").append(btnFinishInput);
+
 }
 
 function createTurnButtons() {
+    let btnFinishTurn = $('<button/>', {
+        text: 'Finished',
+        id: 'btnFinishTurn',
+        "class": "btn btn-primary",
+        click: () => {
+            $.ajax({
+                method: "GET",
+                url: "/game/player/finish",
+                dataType: "json",
+                success: () => update(defaultGame)
+            })
+        }
+    });
+
     $("#interaction").empty();
-    $("#interaction").append(
-        "<button class=\"btn btn-primary\" id=\"btnFinishTurn\">Finished Turn</button>"
-    );
-    $("#btnFinishTurn").click(() => {
-        $.ajax({
-            method: "GET",
-            url: "/game/player/finish",
-            dataType: "json",
-            success: result => {
-                game = result;
-                $("#board").empty();
-                update()
-            }
-        })
-    })
+    $("#interaction").append(btnFinishTurn);
+
 }
 
 function createNextButtons() {
-    $("#interaction").empty();
-    $("#interaction").append(
-        "<button class=\"btn btn-primary\" id=\"btnNextPlayer\">Next Player</button>"
-    );
-    $("#btnNextPlayer").click(() => {
-        $.ajax({
-            method: "GET",
-            url: "/game/player/next",
-            dataType: "json",
-            success: result => {
-                game = result;
-                update()
-            }
-        })
+    let btnNextPlayer = $('<button/>', {
+        text: 'Next',
+        id: 'btnNextPlayer',
+        "class": "btn btn-primary",
+        click: () => {
+            $.ajax({
+                method: "GET",
+                url: "/game/player/next",
+                dataType: "json",
+                success: result => update(result)
+            })
+        }
     });
+    $("#interaction").empty();
+    $("#interaction").append(btnNextPlayer);
+
 
 }
 
@@ -111,7 +120,6 @@ function initButtons() {
         method: "GET",
         url: "/state",
         dataType: "text",
-
         success: result => {
             switch (result) {
                 case "MENU":
@@ -136,11 +144,7 @@ function init() {
         method: "GET",
         url: "/json",
         dataType: "json",
-
-        success: result => {
-            game = result;
-            console.log(result);
-        }
+        success: result => update(result)
     });
 }
 
@@ -148,48 +152,69 @@ function initDesk() {
     $("#desk").empty();
     let row = 0;
     for (let sorted of game.desk.sets) {
-        $("#desk").append("<div class=\"row my-4\" id=\"deskrow" + row + "\"></div>");
+        let div = $("<div/>", {
+            class: "row my-4",
+            id: 'deskrow' + row
+        });
         for (let tile of sorted.struct) {
-            $("#deskrow" + row).append(`
-                <div class="mx-1 align-content-center text-center ${determineColorOfTile(tile)}">
-                   <h3 class="text-white">${tile.value}</h3>
-                   <button id="${tile.value + tile.color[0] + tile.ident}" class="btn btn-link">Move</button>
-                </div>
-            `)
+            let tileDiv = $('<div/>', {
+                class: `mx-1 align-content-center text-center ${determineColorOfTile(tile)}`
+            });
+            tileDiv.append($('<h3/>', {
+                text: tile.value,
+                class: 'text-white'
+            }));
+            const tileId = `${tile.value + tile.color[0] + tile.ident}`;
+            tileDiv.append($('<button/>', {
+                id: tileId,
+                class: 'btn btn-link',
+                text: 'Move',
+                click: () => {
+                    $.ajax({
+                        method: "GET",
+                        url: "/game/player/move/" + tileId,
+                        dataType: "json",
+                        success: result => update(result)
+                    })
+                }
+            }));
+            div.append(tileDiv)
         }
         row += 1;
+        $("#desk").append(div)
     }
-    $("#desk").one("click", (event) => $.ajax({
-        method: "GET",
-        url: "/game/player/move/" + event.target.id,
-        dataType: "json",
-        success: result => {
-            game = result;
-            update()
-        }
-    }));
 }
 
 function initBoard() {
     $("#board").empty();
-    for (let tile of game.desk.players.find(player => player.state.toString() === "TURN").board) {
-        $("#board").append(`
-            <div class="mx-1 align-content-center text-center ${determineColorOfTile(tile)}">
-                <h3 class="text-white">${tile.value}</h3>
-               <button id="${tile.value + tile.color[0] + tile.ident}" class="btn btn-link">Move</button>
-            </div>
-        `)
+    let player = game.desk.players.find(player => player.state.toString() === "TURN");
+    if (!player) {
+        return
     }
-    $("#board").one("click", (event) => $.ajax({
-        method: "GET",
-        url: "/game/player/laydown/" + event.target.id,
-        dataType: "json",
-        success: result => {
-            game = result;
-            update()
-        }
-    }));
-
+    for (let tile of player.board) {
+        let tileDiv = $('<div/>', {
+            class: `mx-1 align-content-center text-center ${determineColorOfTile(tile)}`
+        });
+        tileDiv.append($('<h3/>', {
+            text: tile.value,
+            class: 'text-white'
+        }));
+        const tileId = `${tile.value + tile.color[0] + tile.ident}`;
+        tileDiv.append($('<button/>', {
+            id: tileId,
+            class: 'btn btn-link',
+            text: 'Lay down',
+            click: () => {
+                $.ajax({
+                    method: "GET",
+                    url: "/game/player/laydown/" + tileId,
+                    dataType: "json",
+                    success: result => update(result)
+                })
+            }
+        }));
+        $("#board").append(tileDiv)
+    }
 }
 
 function determineColorOfTile(tile) {
@@ -205,7 +230,9 @@ function determineColorOfTile(tile) {
     }
 }
 
-function update() {
+function update(result) {
+    console.log(result);
+    game = result;
     initButtons();
     updateTodo();
     updateNews();
@@ -242,8 +269,35 @@ function updateNews(string = "") {
 }
 
 
+function initUndo() {
+    $("#btnUndo").click(() => {
+        $.ajax({
+            method: "GET",
+            url: "/game/undo",
+            dataType: "json",
+            success: result => {
+                update(result);
+            }
+        });
+    })
+}
+
+function initRedo() {
+    $("#btnRedo").click(() => {
+        $.ajax({
+            method: "GET",
+            url: "/game/redo",
+            dataType: "json",
+            success: result => {
+                update(result);
+            }
+        });
+    })
+}
+
 $(document).ready(function () {
     console.log('The DOM is ready!');
     init();
-    update()
+    initUndo();
+    initRedo();
 });
