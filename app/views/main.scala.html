@@ -10,52 +10,52 @@
 <html lang="en">
     <head>
         @* Here's where we render the page title `String`. *@
-        <title>@title</title>
+    <title>@title</title>
         @* <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("../../public/stylesheets/main.less")">*@
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap.css")' />
-        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap-grid.css")' />
-        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap-reboot.css")' />
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap.css")' />
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap-grid.css")' />
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/bootstrap/css/bootstrap-reboot.css")' />
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
     </head>
     <body>
         @* And here's where we render the `Html` object containing
         * the page content. *@
 
-        <nav class="navbar navbar-dark navbar-expand-sm bg-dark">
-            <a class="navbar-brand" href="../game/x">Rummy</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../game/x">Play</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../rules">Rules</a>
-                    </li>
-                </ul>
-                <div class="button-group">
-                    <button class="btn btn-outline-primary" id="btn-undo">Undo</button>
-                    <button class="btn btn-outline-primary" id="btn-redo">Redo</button>
-                </div>
-
-                @* <div>*@
-                @* <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("z")">*@
-                @* <input class="btn btn-primary" value="Undo" type="submit">*@
-                @* </form>*@
-                @* </div>*@
-                @* <button class="btn">*@
-                @* <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("r")">*@
-                @* <input class="btn btn-primary" value="Redo" type="submit">*@
-                @* </form>*@
-                @* </button>*@
+    <nav class="navbar navbar-dark navbar-expand-sm bg-dark">
+        <a class="navbar-brand" href="../game/x">Rummy</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="../game/x">Play</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../rules">Rules</a>
+                </li>
+            </ul>
+            <div class="button-group">
+                <button class="btn btn-outline-primary" id="btn-undo">Undo</button>
+                <button class="btn btn-outline-primary" id="btn-redo">Redo</button>
             </div>
-        </nav>
+            @* <div>*@
+            @* <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("z")">*@
+            @* <input class="btn btn-primary" value="Undo" type="submit">*@
+            @* </form>*@
+            @* </div>*@
+            @* <button class="btn">*@
+            @* <form class="btn btn-primary" action="@controllers.routes.RummyController.rummy("r")">*@
+            @* <input class="btn btn-primary" value="Redo" type="submit">*@
+            @* </form>*@
+            @* </button>*@
+        </div>
+    </nav>
 
         @content
 
-        <script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/jquery-3.4.1.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/main.js")" type="text/javascript"></script>
     </body>
 </html>

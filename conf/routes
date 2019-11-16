@@ -4,20 +4,25 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET        /createGame                   controllers.RummyController.createGame
-GET        /loadFile                     controllers.RummyController.loadFile
-GET        /finishNameInput              controllers.RummyController.finishNameInput
-GET        /undo                         controllers.RummyController.undo
-GET        /redo                         controllers.RummyController.redo
-GET        /addPlayer/:name              controllers.RummyController.addPlayer(name:String)
-GET        /switchToNextPlayer           controllers.RummyController.switchToNextPlayer
-GET        /finishTurn                   controllers.RummyController.finishTurn
-GET        /storeFile                    controllers.RummyController.storeFile
-GET        /laydown/:tile                controllers.RummyController.laydown(tile: String)
-GET        /moveTile/:tile1        controllers.RummyController.moveTile(tile1:String)
-GET        /rules                        controllers.RummyController.rules
-GET        /game                         controllers.RummyController.game
+GET        /rules                            controllers.RummyController.rules
+GET        /game                             controllers.RummyController.game
+GET        /json                             controllers.RummyController.json
+GET        /news                             controllers.RummyController.news
+GET        /todo                             controllers.RummyController.todo
+GET        /state                            controllers.RummyController.state
+
+GET        /game/create                      controllers.RummyController.createGame
+GET        /game/store                       controllers.RummyController.storeFile
+GET        /game/load                        controllers.RummyController.loadFile
+GET        /game/undo                        controllers.RummyController.undo
+GET        /game/redo                        controllers.RummyController.redo
+GET        /game/name/finish                 controllers.RummyController.finishNameInput
+GET        /game/name/add/:name              controllers.RummyController.addPlayer(name:String)
+GET        /game/player/next                 controllers.RummyController.switchToNextPlayer
+GET        /game/player/finish               controllers.RummyController.finishTurn
+GET        /game/player/laydown/:tile        controllers.RummyController.laydown(tile: String)
+GET        /game/player/move/:tile1          controllers.RummyController.moveTile(tile1:String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
+GET        /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
 
