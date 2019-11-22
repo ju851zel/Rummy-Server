@@ -191,7 +191,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
         if (tileToMove.get.equals(Tile.stringToTile(tile))) {
           tileToMove = None
         } else {
-          controller.moveTile(Tile.stringToTile(tile), tileToMove.get)
+          controller.moveTile(tileToMove.get, Tile.stringToTile(tile))
           tileToMove = None
         }
       } else {

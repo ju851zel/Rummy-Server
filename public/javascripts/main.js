@@ -203,7 +203,7 @@ function initBoard() {
         tileDiv.append($('<button/>', {
             id: tileId,
             class: 'btn btn-link',
-            text: 'Lay down',
+            text: 'Down',
             click: () => {
                 $.ajax({
                     method: "GET",
