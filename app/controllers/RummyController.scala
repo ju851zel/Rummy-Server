@@ -6,9 +6,8 @@ import de.htwg.se.rummy.controller.component.{AnswerState, ControllerState}
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.TileInterface
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.deskImpl.Tile
 import javax.inject._
+import play.api.libs.json.JsObject
 import play.api.mvc.{Action, _}
-
-import scala.util.matching.Regex
 
 
 /**
@@ -25,6 +24,23 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
 
   def game(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.game(controller))
+  }
+
+  def interaction(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val body = request.body.asJson.get
+    val type1 = (body \ "type").get.as[String]
+    val result = type1 match {
+      case "createGame" => createGame()
+      case "addPlayersName" => addPlayer((body \ "name").get.as[String])
+      case "nameFinish" => finishNameInput()
+      case "playerFinished" => finishTurn()
+      case "nextPlayer" => switchToNextPlayer()
+      case "undo" => undo()
+      case "redo" => redo()
+      case "moveTile" => moveTile((body \ "tile").get.as[String])
+      case "laydownTile" => laydown((body \ "tile").get.as[String])
+    }
+    Ok(result)
   }
 
   def state(): Action[AnyContent] = Action {
@@ -114,11 +130,19 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
 
-  def createGame(): Action[AnyContent] = Action {
+  def createGame(): JsObject = {
     if (controller.currentControllerState == ControllerState.MENU) {
       controller.createDesk(12)
     }
-    Ok(controller.toJson())
+    controller.toJson()
+  }
+
+
+  def addPlayer(name: String): JsObject = {
+    if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
+      controller.addPlayerAndInit(name, 12)
+    }
+    controller.toJson()
   }
 
   def loadFile()(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
@@ -128,42 +152,36 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     Ok(controller.toJson())
   }
 
-  def finishNameInput(): Action[AnyContent] = Action {
+  def finishNameInput(): JsObject = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
       controller.nameInputFinished()
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
-  def undo(): Action[AnyContent] = Action {
+  def undo(): JsObject =  {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.undo()
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
 
-  def redo(): Action[AnyContent] = Action {
+  def redo() = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.redo()
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
-  def addPlayer(name: String): Action[AnyContent] = Action {
-    if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
-      controller.addPlayerAndInit(name, 12)
-    }
-    Ok(controller.toJson().toString())
-  }
 
-  def switchToNextPlayer(): Action[AnyContent] = Action {
+  def switchToNextPlayer(): JsObject = {
     if (controller.currentControllerState == ControllerState.NEXT_TYPE_N) {
       controller.switchToNextPlayer()
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
   def storeFile(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
@@ -178,14 +196,14 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
   }
 
 
-  def laydown(tile: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def laydown(tile: String): JsObject = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       controller.layDownTile(Tile.stringToTile(tile))
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
-  def moveTile(tile: String): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def moveTile(tile: String): JsObject = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       if (tileToMove.isDefined) {
         if (tileToMove.get.equals(Tile.stringToTile(tile))) {
@@ -198,14 +216,14 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
         tileToMove = Some(Tile.stringToTile(tile))
       }
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
-  def finishTurn(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def finishTurn(): JsObject = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       controller.userFinishedPlay()
     }
-    Ok(controller.toJson())
+    controller.toJson()
   }
 
 

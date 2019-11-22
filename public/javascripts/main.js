@@ -13,9 +13,12 @@ function createMenuButtons() {
         id: 'btnCreate',
         "class": "btn btn-primary",
         click: () => $.ajax({
-            method: "GET",
-            url: "/game/create",
+            url: "/game/interaction",
+            type: "POST",
+            data: JSON.stringify({type: "createGame"}),
             dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            processData: false,
             success: result => update(result)
         })
     }));
@@ -46,9 +49,12 @@ function createInsertingNamesButtons() {
                 return
             }
             $.ajax({
-                method: "GET",
-                url: "/game/name/add/" + name,
+                url: "/game/interaction",
+                type: "POST",
+                data: JSON.stringify({type: "addPlayersName", name: name}),
                 dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                processData: false,
                 success: result => update(result)
             })
         }
@@ -60,9 +66,12 @@ function createInsertingNamesButtons() {
         "class": "btn btn-primary mr-2",
         click: () => {
             $.ajax({
-                method: "GET",
-                url: "/game/name/finish",
+                url: "/game/interaction",
+                type: "POST",
+                data: JSON.stringify({type: "nameFinish"}),
                 dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                processData: false,
                 success: result => update(result)
             })
         }
@@ -82,10 +91,13 @@ function createTurnButtons() {
         "class": "btn btn-primary",
         click: () => {
             $.ajax({
-                method: "GET",
-                url: "/game/player/finish",
+                url: "/game/interaction",
+                type: "POST",
+                data: JSON.stringify({type: "playerFinished"}),
                 dataType: "json",
-                success: () => update(defaultGame)
+                contentType: "application/json; charset=utf-8",
+                processData: false,
+                success: (result) => update(defaultGame)
             })
         }
     });
@@ -102,9 +114,12 @@ function createNextButtons() {
         "class": "btn btn-primary",
         click: () => {
             $.ajax({
-                method: "GET",
-                url: "/game/player/next",
+                url: "/game/interaction",
+                type: "POST",
+                data: JSON.stringify({type: "nextPlayer"}),
                 dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                processData: false,
                 success: result => update(result)
             })
         }
@@ -171,9 +186,12 @@ function initDesk() {
                 text: 'Move',
                 click: () => {
                     $.ajax({
-                        method: "GET",
-                        url: "/game/player/move/" + tileId,
+                        url: "/game/interaction",
+                        type: "POST",
+                        data: JSON.stringify({type: "moveTile", tile: tileId}),
                         dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        processData: false,
                         success: result => update(result)
                     })
                 }
@@ -206,10 +224,13 @@ function initBoard() {
             text: 'Down',
             click: () => {
                 $.ajax({
-                    method: "GET",
-                    url: "/game/player/laydown/" + tileId,
+                    url: "/game/interaction",
+                    type: "POST",
+                    data: JSON.stringify({type: "laydownTile", tile: tileId}),
                     dataType: "json",
-                    success: result => update(result)
+                    contentType: "application/json; charset=utf-8",
+                    processData: false,
+                    success: (result) => update(result)
                 })
             }
         }));
@@ -272,26 +293,28 @@ function updateNews(string = "") {
 function initUndo() {
     $("#btnUndo").click(() => {
         $.ajax({
-            method: "GET",
-            url: "/game/undo",
+            url: "/game/interaction",
+            type: "POST",
+            data: JSON.stringify({type: "undo"}),
             dataType: "json",
-            success: result => {
-                update(result);
-            }
-        });
+            contentType: "application/json; charset=utf-8",
+            processData: false,
+            success: (result) => update(result)
+        })
     })
 }
 
 function initRedo() {
     $("#btnRedo").click(() => {
         $.ajax({
-            method: "GET",
-            url: "/game/redo",
+            url: "/game/interaction",
+            type: "POST",
+            data: JSON.stringify({type: "redo"}),
             dataType: "json",
-            success: result => {
-                update(result);
-            }
-        });
+            contentType: "application/json; charset=utf-8",
+            processData: false,
+            success: (result) => update(result)
+        })
     })
 }
 
