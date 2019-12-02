@@ -5,6 +5,31 @@ let game = {
     }
 };
 const defaultGame = game;
+const socket = new WebSocket("ws://localhost:9000/socket");
+
+function initWebSocket() {
+
+    socket.onopen = ((socket, event) => {
+        console.log("onOpen: A new Socket Connection was opened");
+    });
+    socket.onmessage = (event => {
+        if (typeof event.data === "string") {
+            let json = JSON.parse(event.data);
+            update(json);
+        }
+    });
+
+    socket.onerror = ((socket, event) => {
+        console.log("onError: An error occurred");
+    });
+    socket.onclose = ((socket, closeEvent) => {
+        console.log("onClose: THe socket was closed" + closeEvent);
+    });
+
+}
+
+initWebSocket();
+
 
 function createMenuButtons() {
     $("#interaction").empty();
@@ -12,15 +37,7 @@ function createMenuButtons() {
         text: 'Create Desk',
         id: 'btnCreate',
         "class": "btn btn-primary",
-        click: () => $.ajax({
-            url: "/game/interaction",
-            type: "POST",
-            data: JSON.stringify({type: "createGame"}),
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            processData: false,
-            success: result => update(result)
-        })
+        click: () => socket.send(JSON.stringify({type: "createGame"}))
     }));
 }
 
@@ -48,15 +65,7 @@ function createInsertingNamesButtons() {
                 updateNews("Please insert a name");
                 return
             }
-            $.ajax({
-                url: "/game/interaction",
-                type: "POST",
-                data: JSON.stringify({type: "addPlayersName", name: name}),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                processData: false,
-                success: result => update(result)
-            })
+            socket.send(JSON.stringify({type: "addPlayersName", name: name}));
         }
     });
 
@@ -64,17 +73,7 @@ function createInsertingNamesButtons() {
         text: 'Begin',
         id: 'btnFinishName',
         "class": "btn btn-primary mr-2",
-        click: () => {
-            $.ajax({
-                url: "/game/interaction",
-                type: "POST",
-                data: JSON.stringify({type: "nameFinish"}),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                processData: false,
-                success: result => update(result)
-            })
-        }
+        click: () => socket.send(JSON.stringify({type: "nameFinish"}),)
     });
 
     $("#interaction").empty();
@@ -89,22 +88,11 @@ function createTurnButtons() {
         text: 'Finished',
         id: 'btnFinishTurn',
         "class": "btn btn-primary",
-        click: () => {
-            $.ajax({
-                url: "/game/interaction",
-                type: "POST",
-                data: JSON.stringify({type: "playerFinished"}),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                processData: false,
-                success: (result) => update(defaultGame)
-            })
-        }
+        click: () => socket.send(JSON.stringify({type: "playerFinished"}))
     });
 
     $("#interaction").empty();
     $("#interaction").append(btnFinishTurn);
-
 }
 
 function createNextButtons() {
@@ -112,22 +100,11 @@ function createNextButtons() {
         text: 'Next',
         id: 'btnNextPlayer',
         "class": "btn btn-primary",
-        click: () => {
-            $.ajax({
-                url: "/game/interaction",
-                type: "POST",
-                data: JSON.stringify({type: "nextPlayer"}),
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                processData: false,
-                success: result => update(result)
-            })
-        }
+        click: () => socket.send(JSON.stringify({type: "nextPlayer"}))
     });
+    $("#board").empty();
     $("#interaction").empty();
     $("#interaction").append(btnNextPlayer);
-
-
 }
 
 function initButtons() {
@@ -184,17 +161,7 @@ function initDesk() {
                 id: tileId,
                 class: 'btn btn-link',
                 text: 'Move',
-                click: () => {
-                    $.ajax({
-                        url: "/game/interaction",
-                        type: "POST",
-                        data: JSON.stringify({type: "moveTile", tile: tileId}),
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        processData: false,
-                        success: result => update(result)
-                    })
-                }
+                click: () => socket.send(JSON.stringify({type: "moveTile", tile: tileId}))
             }));
             div.append(tileDiv)
         }
@@ -222,17 +189,7 @@ function initBoard() {
             id: tileId,
             class: 'btn btn-link',
             text: 'Down',
-            click: () => {
-                $.ajax({
-                    url: "/game/interaction",
-                    type: "POST",
-                    data: JSON.stringify({type: "laydownTile", tile: tileId}),
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    processData: false,
-                    success: (result) => update(result)
-                })
-            }
+            click: () => socket.send(JSON.stringify({type: "laydownTile", tile: tileId}))
         }));
         $("#board").append(tileDiv)
     }
@@ -266,7 +223,6 @@ function updateTodo() {
         method: "GET",
         url: "/todo",
         dataType: "text",
-
         success: result => {
             $("#todo").text(result);
         }
@@ -291,31 +247,11 @@ function updateNews(string = "") {
 
 
 function initUndo() {
-    $("#btnUndo").click(() => {
-        $.ajax({
-            url: "/game/interaction",
-            type: "POST",
-            data: JSON.stringify({type: "undo"}),
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            processData: false,
-            success: (result) => update(result)
-        })
-    })
+    $("#btnUndo").click(() => socket.send(JSON.stringify({type: "undo"})))
 }
 
 function initRedo() {
-    $("#btnRedo").click(() => {
-        $.ajax({
-            url: "/game/interaction",
-            type: "POST",
-            data: JSON.stringify({type: "redo"}),
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            processData: false,
-            success: (result) => update(result)
-        })
-    })
+    $("#btnRedo").click(() => socket.send(JSON.stringify({type: "redo"})))
 }
 
 $(document).ready(function () {

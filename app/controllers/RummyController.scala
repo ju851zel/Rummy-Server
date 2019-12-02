@@ -1,12 +1,15 @@
 package controllers
 
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.stream.Materializer
 import de.htwg.se.rummy.Rummy
 import de.htwg.se.rummy.controller.ControllerInterface
 import de.htwg.se.rummy.controller.component.{AnswerState, ControllerState}
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.TileInterface
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.deskImpl.Tile
 import javax.inject._
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.streams.ActorFlow
 import play.api.mvc.{Action, _}
 
 
@@ -15,19 +18,17 @@ import play.api.mvc.{Action, _}
  * application's home page.
  */
 @Singleton
-class RummyController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class RummyController @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
   var toMove: Option[String] = None
   val controller: ControllerInterface = Rummy.controller
   var tileToMove: Option[TileInterface] = None
-
-  controller.add(() => {})
 
   def game(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.game(controller))
   }
 
-  def interaction(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    val body = request.body.asJson.get
+  def interaction(message: String) {
+    val body = Json.parse(message)
     val type1 = (body \ "type").get.as[String]
     val result = type1 match {
       case "createGame" => createGame()
@@ -159,7 +160,7 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     controller.toJson()
   }
 
-  def undo(): JsObject =  {
+  def undo(): JsObject = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.undo()
@@ -224,6 +225,38 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
       controller.userFinishedPlay()
     }
     controller.toJson()
+  }
+
+  def socket = WebSocket.accept[String, String] { request =>
+    ActorFlow.actorRef { out =>
+      println("Connect received")
+      WebSocketActorFactory.create(out)
+    }
+  }
+
+  class WebSocketActor(out: ActorRef) extends Actor {
+
+    controller.add(() => {
+      sendJsonToClient()
+    })
+
+    def receive: PartialFunction[Any, Unit] = {
+      case msg: String =>
+        out ! controller.toJson.toString()
+        interaction(msg)
+        println("Sent Json to Client" + msg)
+
+    }
+    def sendJsonToClient(): Unit = {
+      out ! controller.toJson.toString()
+      println("Received event from Controller: " +  controller.toJson.toString())
+    }
+  }
+
+  object WebSocketActorFactory {
+    def create(out: ActorRef): Props = {
+      Props(new WebSocketActor(out))
+    }
   }
 
 

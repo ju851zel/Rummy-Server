@@ -4,6 +4,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
+GET        /socket                    controllers.RummyController.socket
 GET         /rules                   controllers.RummyController.rules
 GET         /game                    controllers.RummyController.game
 GET         /news                    controllers.RummyController.news
@@ -11,7 +12,6 @@ GET         /todo                    controllers.RummyController.todo
 GET         /state                   controllers.RummyController.state
 GET         /json                    controllers.RummyController.json
 POST        /game                    controllers.RummyController.game
-POST        /game/interaction        controllers.RummyController.interaction
 
 
 GET         /game/store              controllers.RummyController.storeFile
