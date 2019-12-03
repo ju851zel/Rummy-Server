@@ -5,9 +5,17 @@ import de.htwg.se.rummy.controller.ControllerInterface
 import de.htwg.se.rummy.controller.component.{AnswerState, ControllerState}
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.TileInterface
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.deskImpl.Tile
-import javax.inject._
 import play.api.libs.json.JsObject
-import play.api.mvc.{Action, _}
+import scalafx.scene.input.KeyCode.Props
+
+import play.api.libs.streams.ActorFlow
+import akka.actor._
+
+import javax.inject._
+
+import play.api.mvc._
+
+import scala.swing.Reactor
 
 
 /**
@@ -226,5 +234,36 @@ class RummyController @Inject()(cc: ControllerComponents) extends AbstractContro
     controller.toJson()
   }
 
+  def socket = WebSocket.accept[String, String] {
+    ActorFlow.actorRef {out =>
+      println("Connect receved")
+      RummyWebSocketActorFactory.create(out)
+      }
+  }
 
+  object RummyWebSocketActorFactory {
+    def create(out: ActorRef) = {
+      Props(new RummyWebSocketActor(out))
+    }
+  }
+
+  class RummyWebSocketActor(out: ActorRef) extends Actor with Reactor{
+    listenTo(Rummy.controller)
+
+    def receive = {
+      case msg: String =>
+        out ! (controller.toJson.toString)
+        println("Set Json to Client" + msg)
+    }
+
+    reactions += {
+      case event: ControllerState => sendJsonToClient
+      case event: AnswerState => sendJsonToClient
+    }
+
+    def sendJsonToClient = {
+      println("Received event from controller")
+      out ! (controller.toJson.toString)
+    }
+  }
 }
