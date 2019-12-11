@@ -156,6 +156,7 @@ function initDesk() {
                 text: tile.value,
                 class: 'text-white'
             }));
+            tileDiv.append($('<tile-element/>', {}));
             const tileId = `${tile.value + tile.color[0] + tile.ident}`;
             tileDiv.append($('<button/>', {
                 id: tileId,

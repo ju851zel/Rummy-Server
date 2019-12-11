@@ -1,13 +1,1 @@
-logs
-target
-/.idea
-/.idea_modules
-/.classpath
-/.project
-/.settings
-/RUNNING_PID
-.DS_Store
-.g8/
-/.g8/form/
-/*.deb
-/*.deb.1
+/node_modules/
