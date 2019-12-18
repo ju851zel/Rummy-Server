@@ -1,33 +1,3 @@
-.tileR {
-    background-color: #ff8080;
-    border-radius: 7px;
-    padding: 10px 5px;
-    margin: 5px;
-}
-
-.tileB {
-    background-color: #7c99d6;
-    border-radius: 7px;
-    padding: 10px 5px;
-    margin: 5px;
-
-}
-
-
-.tileY {
-    background-color: #dee84f;
-    border-radius: 7px;
-    padding: 10px 5px;
-    margin: 5px;
-}
-
-
-.tileG {
-    background-color: #6ff78b;
-    border-radius: 7px;
-    padding: 10px 5px;
-    margin: 5px;
-}
 
 h1 {
     color: red;

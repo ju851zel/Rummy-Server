@@ -196,18 +196,18 @@ function initBoard() {
     }
 }
 
-function determineColorOfTile(tile) {
-    switch (tile.color) {
-        case "YELLOW":
-            return "tileY";
-        case "RED":
-            return "tileR";
-        case "GREEN":
-            return "tileG";
-        case "BLUE":
-            return "tileB";
-    }
-}
+// function determineColorOfTile(tile) {
+//     switch (tile.color) {
+//         case "YELLOW":
+//             return "tileY";
+//         case "RED":
+//             return "tileR";
+//         case "GREEN":
+//             return "tileG";
+//         case "BLUE":
+//             return "tileB";
+//     }
+// }
 
 function update(result) {
     console.log(result);

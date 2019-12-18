@@ -8,9 +8,9 @@ import de.htwg.se.rummy.controller.component.{AnswerState, ControllerState}
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.TileInterface
 import de.htwg.se.rummy.model.deskComp.deskBaseImpl.deskImpl.Tile
 import javax.inject._
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.Json
 import play.api.libs.streams.ActorFlow
-import play.api.mvc.{Action, _}
+import play.api.mvc._
 
 
 /**
@@ -20,17 +20,15 @@ import play.api.mvc.{Action, _}
 @Singleton
 class RummyController @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
   var toMove: Option[String] = None
-  val controller: ControllerInterface = Rummy.controller
+  var controller: ControllerInterface = Rummy.controller
   var tileToMove: Option[TileInterface] = None
 
-  def game(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.game(controller))
-  }
 
-  def interaction(message: String) {
+  def interaction(message: String): Unit = {
     val body = Json.parse(message)
     val type1 = (body \ "type").get.as[String]
     val result = type1 match {
+      case "quit" => quitGame()
       case "createGame" => createGame()
       case "addPlayersName" => addPlayer((body \ "name").get.as[String])
       case "nameFinish" => finishNameInput()
@@ -38,13 +36,19 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
       case "nextPlayer" => switchToNextPlayer()
       case "undo" => undo()
       case "redo" => redo()
+      case "json" => json()
       case "moveTile" => moveTile((body \ "tile").get.as[String])
       case "laydownTile" => laydown((body \ "tile").get.as[String])
+      case _ => ""
     }
-    Ok(result)
   }
 
-  def state(): Action[AnyContent] = Action {
+  def quitGame(): String = {
+    controller = Rummy.controller
+    json()
+  }
+
+  def state(): String = {
     val string: String = controller.currentControllerState match {
       case ControllerState.P_TURN =>
         "P_TURN"
@@ -57,64 +61,80 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
       case _ =>
         "MENU"
     }
-    Ok(string)
+    string
   }
 
-  def json(): Action[AnyContent] = Action {
-    Ok(controller.toJson().toString())
+  def json(newz: String = null): String = {
+    var obj = controller.toJson()
+    obj = obj.+("state", Json.toJson(state()))
+    obj = obj.+("todo", Json.toJson(todo()))
+    if (newz != null) {
+      obj = obj.+("news", Json.toJson(newz))
+    } else {
+      obj = obj.+("news", Json.toJson(news()))
+    }
+    println("JSON:\n\n" + obj.toString)
+    obj.toString()
   }
 
-  def news(): Action[AnyContent] = Action {
+  def news(): String = {
+    println("Controller State: " + controller.currentAnswerState)
     val string = controller.currentAnswerState match {
       case AnswerState.P_FINISHED =>
-        "You are finished."
+        "Finished turn."
       case AnswerState.TABLE_NOT_CORRECT =>
         "Table looks not correct, please move tiles to match the rules or undo until it matches"
       case AnswerState.P_WON =>
-        s"${controller.getCurrentPlayer.name} is the winner."
+        controller.getCurrentPlayer.name + " is the winner."
       case AnswerState.UNDO_TAKE_TILE =>
         "The tile has been put back in the bag"
       case AnswerState.BAG_IS_EMPTY =>
         "No more tiles in the bag. You must lay a tile down"
       case AnswerState.CANT_MOVE_THIS_TILE =>
-        "You can not move this tile."
+        "Can not move this tile."
       case AnswerState.UNDO_MOVED_TILE =>
-        "You undid the move of a specific tile."
+        "Undo move of a specific tile."
       case AnswerState.MOVED_TILE =>
-        "You did move a tile to another."
+        "Moved a tile to another."
       case AnswerState.UNDO_LAY_DOWN_TILE =>
-        "You undid the lay down you took the tile up."
+        "Undo lay down."
       case AnswerState.ADDED_PLAYER =>
-        "You added a player."
+        "Added a player."
       case AnswerState.PUT_TILE_DOWN =>
-        "You put down a tile"
+        "Put down a tile"
       case AnswerState.PLAYER_REMOVED =>
-        "You removed the player you inserted."
+        "Removed the player you inserted."
       case AnswerState.P_DOES_NOT_OWN_TILE =>
         "You dont have this tile on the board. Please select another one"
       case AnswerState.INSERTING_NAMES_FINISHED =>
-        "You finished inserting the names."
+        "Finished inserting the names."
       case AnswerState.STORED_FILE =>
-        "You stored the game in a file"
+        "The game was stored in a file"
       case AnswerState.NOT_ENOUGH_PLAYERS =>
         "Not enough Players. Add some more."
       case AnswerState.COULD_NOT_LOAD_FILE =>
         "Could not load the file. Created a new game instead."
       case AnswerState.LOADED_FILE =>
-        "You loaded a file"
+        "Loaded a saved game"
       case AnswerState.CREATED_DESK =>
-        "You started the game by creating a desk"
+        "Game started by creating a desk. Have fun."
       case AnswerState.UNDO_MOVED_TILE_NOT_DONE =>
         "Undo the move of the tile unnecessary. Nothing did happen."
       case AnswerState.P_FINISHED_UNDO =>
-        "Its is again your turn. "
+        "Its is again your turn."
+      case AnswerState.TAKE_TILE =>
+        "Automatically took a tile up."
+      case AnswerState.ENOUGH_PLAYER =>
+        "No more players possible. Start the game!"
+      case AnswerState.NONE =>
+       "Do your thing."
       case _ =>
-        "Lets start, shall we?"
+        "ERROR 512231"
     }
-    Ok(string)
+    string
   }
 
-  def todo(): Action[AnyContent] = Action {
+  def todo(): String = {
     val string: String = controller.currentControllerState match {
       case ControllerState.P_TURN =>
         s"${controller.getCurrentPlayer.name} it's your turn."
@@ -127,111 +147,113 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
       case _ =>
         "Click On Create Desk."
     }
-    Ok(string)
+    string
   }
 
 
-  def createGame(): JsObject = {
+  def createGame(): String = {
     if (controller.currentControllerState == ControllerState.MENU) {
       controller.createDesk(12)
     }
-    controller.toJson()
+    json()
   }
 
 
-  def addPlayer(name: String): JsObject = {
+  def addPlayer(name: String): String = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
       controller.addPlayerAndInit(name, 12)
     }
-    controller.toJson()
+    json()
   }
 
-  def loadFile()(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def loadFile(): String = {
     if (controller.currentControllerState == ControllerState.MENU) {
       controller.loadFile()
     }
-    Ok(controller.toJson())
+    json()
   }
 
-  def finishNameInput(): JsObject = {
+  def finishNameInput(): String = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES) {
       controller.nameInputFinished()
     }
-    controller.toJson()
+    json()
   }
 
-  def undo(): JsObject = {
+  def undo(): Unit = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.undo()
     }
-    controller.toJson()
   }
 
 
-  def redo() = {
+  def redo(): Unit = {
     if (controller.currentControllerState == ControllerState.INSERTING_NAMES
       || controller.currentControllerState == ControllerState.P_TURN) {
       controller.redo()
     }
-    controller.toJson()
   }
 
 
-  def switchToNextPlayer(): JsObject = {
+  def switchToNextPlayer(): String = {
     if (controller.currentControllerState == ControllerState.NEXT_TYPE_N) {
       controller.switchToNextPlayer()
     }
-    controller.toJson()
+    json()
   }
 
-  def storeFile(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+  def storeFile(): String = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       controller.storeFile()
     }
-    Ok(controller.toJson())
-  }
-
-  def rules(): Action[AnyContent] = Action {
-    Ok(views.html.rules())
+    json()
   }
 
 
-  def laydown(tile: String): JsObject = {
+  def laydown(tile: String): String = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       controller.layDownTile(Tile.stringToTile(tile))
     }
-    controller.toJson()
+    json()
   }
 
-  def moveTile(tile: String): JsObject = {
+  def moveTile(tile: String): String = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       if (tileToMove.isDefined) {
         if (tileToMove.get.equals(Tile.stringToTile(tile))) {
           tileToMove = None
+          val news = "You unselected a tile to move"
+          json(news)
         } else {
           controller.moveTile(tileToMove.get, Tile.stringToTile(tile))
           tileToMove = None
+          val news = "You unselected a tile to move"
+          json(news)
         }
       } else {
         tileToMove = Some(Tile.stringToTile(tile))
+        val news = "You selected a tile to move"
+        json(news)
       }
     }
-    controller.toJson()
+    json()
   }
 
-  def finishTurn(): JsObject = {
+  def finishTurn(): String = {
     if (controller.currentControllerState == ControllerState.P_TURN) {
       controller.userFinishedPlay()
     }
-    controller.toJson()
+    json()
   }
 
-  def socket = WebSocket.accept[String, String] { request =>
-    ActorFlow.actorRef { out =>
-      println("Connect received")
-      WebSocketActorFactory.create(out)
-    }
+  def socket = WebSocket.accept[String, String] {
+    request =>
+      ActorFlow.actorRef {
+        out =>
+          println("Connect received")
+          WebSocketActorFactory.create(out)
+      }
   }
 
   class WebSocketActor(out: ActorRef) extends Actor {
@@ -239,17 +261,17 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
     controller.add(() => {
       sendJsonToClient()
     })
+    sendJsonToClient()
 
     def receive: PartialFunction[Any, Unit] = {
       case msg: String =>
-        out ! controller.toJson.toString()
+        println("Came in: " + msg)
         interaction(msg)
-        println("Sent Json to Client" + msg)
-
     }
+
     def sendJsonToClient(): Unit = {
-      out ! controller.toJson.toString()
-      println("Received event from Controller: " +  controller.toJson.toString())
+      println("Received event from Controller: " + controller.toJson.toString())
+      out ! json()
     }
   }
 
