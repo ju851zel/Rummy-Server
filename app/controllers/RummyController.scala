@@ -23,6 +23,9 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
   var controller: ControllerInterface = Rummy.controller
   var tileToMove: Option[TileInterface] = None
 
+  def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    Ok("")
+  }
 
   def interaction(message: String): Unit = {
     val body = Json.parse(message)
