@@ -27,7 +27,7 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
     Ok("")
   }
 
-  def interaction(message: String): Unit = {
+  def interaction(message: String): String = {
     val body = Json.parse(message)
     val type1 = (body \ "type").get.as[String]
     val result = type1 match {
@@ -40,10 +40,12 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
       case "undo" => undo()
       case "redo" => redo()
       case "json" => json()
+      case "state" => json()
       case "moveTile" => moveTile((body \ "tile").get.as[String])
       case "laydownTile" => laydown((body \ "tile").get.as[String])
-      case _ => ""
+      case _ => json()
     }
+    json()
   }
 
   def quitGame(): String = {
@@ -76,7 +78,7 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
     } else {
       obj = obj.+("news", Json.toJson(news()))
     }
-    println("JSON:\n\n" + obj.toString)
+    println("JSON:\t" + obj.toString)
     obj.toString()
   }
 
@@ -261,20 +263,30 @@ class RummyController @Inject()(cc: ControllerComponents)(implicit system: Actor
 
   class WebSocketActor(out: ActorRef) extends Actor {
 
+    var block = false
     controller.add(() => {
-      sendJsonToClient()
+      if (!block) {
+        println("Called add of controller")
+        sendJsonToClient()
+      }
+      block = false
     })
     sendJsonToClient()
 
     def receive: PartialFunction[Any, Unit] = {
       case msg: String =>
         println("Came in: " + msg)
-        interaction(msg)
+        block = true
+        val x = interaction(msg)
+        println("Sending x: " + x)
+        out ! x
+
     }
 
     def sendJsonToClient(): Unit = {
       println("Received event from Controller: " + controller.toJson.toString())
       out ! json()
+      println("send to client")
     }
   }
 
